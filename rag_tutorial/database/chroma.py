@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import DirectoryLoader, PyPDFDirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.schema import Document
@@ -10,7 +10,14 @@ from loguru import logger
 
 class ChromaDatabase:
     
-    def __init__(self, chroma_path: str, data_path: str, chunk_size: int = 300, chunk_overlap: int = 100):
+    def __init__(
+        self, 
+        chroma_path: str, 
+        data_path: str, 
+        chunk_size: int = 300, 
+        chunk_overlap: int = 100, 
+        file_type: str = "md"
+    ):
         """
         Initialize the ChromaDatabase with paths for Chroma and data.
 
@@ -18,11 +25,13 @@ class ChromaDatabase:
         :param data_path: Path to the directory containing data files.
         :param chunk_size: Chunk size for splitting text.
         :param chunk_overlap: Chunk overlap for splitting text.
+        :param file_type: File type to load from the data directory.
         """
         self.chroma_path = chroma_path
         self.data_path = data_path
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.file_type = file_type
         
     def generate_data_store(self) -> None:
         """
@@ -38,9 +47,18 @@ class ChromaDatabase:
 
         :return: A list of loaded Document objects.
         """
-        loader = DirectoryLoader(self.data_path, glob="*.md")
+        logger.info(f"Loading documents from {self.data_path}.")
+        loader = self._get_doc_loader()
         documents = loader.load()
         return documents
+    
+    def _get_doc_loader(self):
+        if self.file_type == "md":
+            return DirectoryLoader(self.data_path, glob=f"*.{self.file_type}")
+        elif self.file_type == "pdf":
+            return PyPDFDirectoryLoader(self.data_path)
+        else:
+            raise ValueError(f"Unsupported file type: {self.file_type}")
     
     def _split_text(self, documents: list[Document]) -> list[Document]:
         """
@@ -49,6 +67,7 @@ class ChromaDatabase:
         :param documents: A list of Document objects to be split.
         :return: A list of Document chunks.
         """
+        logger.info(f"Splitting text into chunks with size {self.chunk_size} and overlap {self.chunk_overlap}.")
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,

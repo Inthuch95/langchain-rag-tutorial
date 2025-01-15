@@ -171,3 +171,5 @@ cython_debug/
 .pypirc
 
 chroma/
+data/
+.DS_Store

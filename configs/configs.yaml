@@ -1,5 +1,12 @@
 database:
   chroma_path: "chroma"
-  data_path: "data/books"
-  chunk_size: 300
-  chunk_overlap: 100
+  data_path: "data/brewdog"
+  chunk_size: 1500
+  chunk_overlap: 150
+  file_type: "pdf"
+app:
+  create_db: False
+  chroma_path: "chroma"
+  k: 4
+  similarity_threshold: 0.7
+  model: "gpt-4o-mini"
