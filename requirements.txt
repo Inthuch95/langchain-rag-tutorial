@@ -1,0 +1,14 @@
+python-dotenv
+langchain
+langchain-community
+langchain-openai
+loguru
+unstructured
+# onnxruntime==1.17.1 # chromadb dependency: on Mac use `conda install onnxruntime -c conda-forge`
+# For Windows users, install Microsoft Visual C++ Build Tools first
+# install onnxruntime before installing `chromadb`
+chromadb
+openai
+tiktoken
+
+# install markdown depenendies with: `pip install "unstructured[md]"` after install the requirements file. Leave this line commented out. 

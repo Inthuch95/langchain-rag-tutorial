@@ -1,0 +1,5 @@
+database:
+  chroma_path: "chroma"
+  data_path: "data/books"
+  chunk_size: 300
+  chunk_overlap: 100
