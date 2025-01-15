@@ -7,21 +7,12 @@ from loguru import logger
 from rag_tutorial.database.chroma import ChromaDatabase
 from rag_tutorial.model.openai_llm import OpenAIModel
 from rag_tutorial.utils.config import read_config
+from rag_tutorial.utils.database import init_vector_database
 
 
 load_dotenv()
 openai.api_key = os.environ["OPENAI_API_KEY"]
 CONFIG_PATH = "configs/configs.yaml"
-
-PROMPT_TEMPLATE = """
-Answer the question based only on the following context:
-
-{context}
-
----
-
-Answer the question based on the above context: {question}
-"""
 
 def main():
     parser = argparse.ArgumentParser()
@@ -34,18 +25,7 @@ def main():
     app_config = config["app"]
     
     # Initialize vector DB
-    if app_config["create_db"]:
-        vector_db = ChromaDatabase(
-            db_config["chroma_path"], 
-            db_config["data_path"],
-            db_config["chunk_size"],
-            db_config["chunk_overlap"],
-            db_config["file_type"]
-        )
-        vector_db.generate_data_store()
-    else:
-        vector_db = ChromaDatabase()
-        vector_db.load_db(db_config["chroma_path"])
+    vector_db = init_vector_database(app_config, db_config)
     
     # Load LLM and send query.
     model = OpenAIModel(app_config["model_name"])
