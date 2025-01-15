@@ -26,7 +26,11 @@ def main():
     # Load LLM model and vector database
     model = OpenAIModel(app_config["model_name"])
     vector_db = init_vector_database(app_config, db_config)
-    documents = vector_db.search(query_text, k=app_config["k"], similarity_threshold=app_config["similarity_threshold"])
+    try:
+        documents = vector_db.search(query_text, k=app_config["k"], similarity_threshold=app_config["similarity_threshold"])
+    except Exception as e:
+        logger.error(f"Error searching database: {e}")
+        return
     
     # Send query to LLM and get response
     response_text = model.predict(query_text, documents)
