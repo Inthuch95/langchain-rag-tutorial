@@ -9,14 +9,13 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from loguru import logger
 
 class ChromaDatabase:
-    
     def __init__(
         self, 
-        chroma_path: str, 
-        data_path: str, 
+        chroma_path: str = "chroma", 
+        data_path: str = "data", 
         chunk_size: int = 300, 
         chunk_overlap: int = 100, 
-        file_type: str = "md"
+        file_type: str = "txt"
     ):
         """
         Initialize the ChromaDatabase with paths for Chroma and data.
@@ -41,6 +40,30 @@ class ChromaDatabase:
         chunks = self._split_text(documents)
         self._save_to_chroma(chunks)
         
+    def load_db(self, chroma_path: str) -> None:
+        """
+        Load the Chroma database from the specified path.
+
+        :param chroma_path: Path to the Chroma database.
+        """
+        self.db = Chroma(persist_directory=chroma_path, embedding_function=OpenAIEmbeddings())
+        logger.info(f"Loaded Chroma database from {chroma_path}.")
+    
+    def search(self, query_text: str, k: int = 4, similarity_threshold: float = 0.7) -> list[tuple[Document, float]]:
+        """
+        Search the Chroma database for similar documents.
+        
+        :param query_text: The query text to search for.
+        :param k: The number of results to return.
+        :param similarity_threshold: The minimum similarity score to return results.
+        :return: A list of tuples containing the Document and similarity score.
+        """
+        results = self.db.similarity_search_with_relevance_scores(query_text, k)
+        if len(results) == 0 or results[0][1] < similarity_threshold:
+            logger.info(f"Unable to find matching results.")
+            raise ValueError("No matching results found.")
+        return results
+    
     def _load_documents(self) -> list[Document]:
         """
         Load documents from the specified data path.
@@ -89,9 +112,9 @@ class ChromaDatabase:
             shutil.rmtree(self.chroma_path)
 
         # Create a new DB from the documents.
-        db = Chroma.from_documents(
+        self.db = Chroma.from_documents(
             chunks, OpenAIEmbeddings(), persist_directory=self.chroma_path
         )
-        db.persist()
+        self.db.persist()
         logger.info(f"Saved {len(chunks)} chunks to {self.chroma_path}.")
         

@@ -9,4 +9,4 @@ app:
   chroma_path: "chroma"
   k: 4
   similarity_threshold: 0.7
-  model: "gpt-4o-mini"
+  model_name: "gpt-4o-mini"
