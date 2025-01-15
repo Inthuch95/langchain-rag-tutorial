@@ -75,7 +75,12 @@ class ChromaDatabase:
         documents = loader.load()
         return documents
     
-    def _get_doc_loader(self):
+    def _get_doc_loader(self) -> None:
+        """
+        Get the document loader based on the file type.
+
+        :return: A document loader object.
+        """
         if self.file_type == "md":
             return DirectoryLoader(self.data_path, glob=f"*.{self.file_type}")
         elif self.file_type == "pdf":

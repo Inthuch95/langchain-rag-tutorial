@@ -23,12 +23,12 @@ def main():
     db_config = config["database"]
     app_config = config["app"]
     
-    # Initialize vector DB
-    vector_db = init_vector_database(app_config, db_config)
-    
-    # Load LLM and send query.
+    # Load LLM model and vector database
     model = OpenAIModel(app_config["model_name"])
+    vector_db = init_vector_database(app_config, db_config)
     documents = vector_db.search(query_text, k=app_config["k"], similarity_threshold=app_config["similarity_threshold"])
+    
+    # Send query to LLM and get response
     response_text = model.predict(query_text, documents)
     logger.info(f"Response: {response_text}")
     
