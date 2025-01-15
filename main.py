@@ -4,7 +4,6 @@ import os
 
 from dotenv import load_dotenv
 from loguru import logger
-from rag_tutorial.database.chroma import ChromaDatabase
 from rag_tutorial.model.openai_llm import OpenAIModel
 from rag_tutorial.utils.config import read_config
 from rag_tutorial.utils.database import init_vector_database
