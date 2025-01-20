@@ -8,5 +8,5 @@ app:
   create_db: False
   chroma_path: "chroma"
   k: 4
-  similarity_threshold: 0.7
+  similarity_threshold: 0.5
   model_name: "gpt-4o-mini"
